@@ -1,0 +1,189 @@
+# Let's create an HTML file with the provided unified admin and student panel functionality.
+html_code = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mock Registration</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f9f4ff, #ffffff);
+      color: #4b0082;
+      max-width: 600px;
+      margin: auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      animation: fadeInUp 1s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #6a0dad;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    button:hover {
+      background-color: #4f007c;
+    }
+
+    input, textarea, select {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Welcome to Mock Test Portal</h1>
+
+  <div id="accountSection" class="fade-in">
+    <h2>Create Your Account</h2>
+    <input type="text" id="name" placeholder="Full Name" />
+    <input type="text" id="phone" placeholder="Phone Number (+998...)" />
+    <button onclick="handleLogin()">Start</button>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="hidden fade-in">
+    <h2>Admin Panel</h2>
+    <button onclick="toggle('adminTimes')">Add Time Slots</button>
+    <button onclick="toggle('adminPhones')">Add Student Phone Numbers</button>
+
+    <div id="adminTimes" class="hidden">
+      <textarea id="timesInput" placeholder="One time per line, e.g. Monday 10:00"></textarea>
+      <button onclick="saveTimes()">Save Times</button>
+    </div>
+
+    <div id="adminPhones" class="hidden">
+      <textarea id="phonesInput" placeholder="Enter phone numbers (+998...) one per line"></textarea>
+      <button onclick="savePhones()">Save Phone Numbers</button>
+    </div>
+  </div>
+
+  <!-- Student Panel -->
+  <div id="studentPanel" class="hidden fade-in">
+    <h2>Choose Your Speaking Time</h2>
+    <button onclick="loadTimes()">Select Time</button>
+    <div id="timeSelection" class="hidden">
+      <select id="timeDropdown"></select>
+      <button onclick="confirmTime()">Confirm</button>
+    </div>
+  </div>
+
+  <!-- Not Registered -->
+  <div id="notRegistered" class="hidden fade-in">
+    <h3>Sorry, your number is not registered for this week's mock test.</h3>
+  </div>
+
+  <script>
+    const adminPhones = ["+998777771968", "+998959637101", "+998910122461"];
+    const studentPhonesKey = "studentPhones";
+    const timeSlotsKey = "timeSlots";
+
+    function handleLogin() {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      if (!name || !phone) {
+        alert("Please fill in both name and phone number.");
+        return;
+      }
+
+      localStorage.setItem("currentUser", JSON.stringify({ name, phone }));
+
+      if (adminPhones.includes(phone)) {
+        showSection("adminPanel");
+      } else {
+        const allowedPhones = JSON.parse(localStorage.getItem(studentPhonesKey)) || [];
+        if (allowedPhones.includes(phone)) {
+          showSection("studentPanel");
+        } else {
+          showSection("notRegistered");
+        }
+      }
+    }
+
+    function toggle(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle("hidden");
+    }
+
+    function showSection(sectionId) {
+      document.getElementById("accountSection").classList.add("hidden");
+      document.getElementById("adminPanel").classList.add("hidden");
+      document.getElementById("studentPanel").classList.add("hidden");
+      document.getElementById("notRegistered").classList.add("hidden");
+
+      document.getElementById(sectionId).classList.remove("hidden");
+    }
+
+    function saveTimes() {
+      const times = document.getElementById("timesInput").value.trim().split("\\n").filter(Boolean);
+      localStorage.setItem(timeSlotsKey, JSON.stringify(times));
+      alert("Time slots saved!");
+    }
+
+    function savePhones() {
+      const phones = document.getElementById("phonesInput").value.trim().split("\\n").filter(Boolean);
+      localStorage.setItem(studentPhonesKey, JSON.stringify(phones));
+      alert("Student numbers saved!");
+    }
+
+    function loadTimes() {
+      const times = JSON.parse(localStorage.getItem(timeSlotsKey)) || [];
+      const dropdown = document.getElementById("timeDropdown");
+      dropdown.innerHTML = "";
+      times.forEach(t => {
+        const option = document.createElement("option");
+        option.value = t;
+        option.textContent = t;
+        dropdown.appendChild(option);
+      });
+      document.getElementById("timeSelection").classList.remove("hidden");
+    }
+
+    function confirmTime() {
+      const selected = document.getElementById("timeDropdown").value;
+      alert("You selected: " + selected);
+    }
+  </script>
+
+</body>
+</html>
+"""
+
+# Write the HTML content to a file
+file_path = "/mnt/data/mock_registration_portal.html"
+with open(file_path, "w") as file:
+    file.write(html_code)
+
+file_path
